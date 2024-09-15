@@ -1,0 +1,37 @@
+{
+    "executionRoleArn": "arn:aws:iam::939458553633:role/hoabl-backend-dev-ECS-8BYICHE-ECSTaskExecutionRole-1Q1FYOHEVIMQQ",
+    "containerDefinitions": [
+        {
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "hoabl-backend-dev-HoABLAdminMicroservice-10UUBO2NI2BS5",
+                    "awslogs-region": "ap-south-1",
+                    "awslogs-stream-prefix": "hoabl-backend-dev-HoABLAdminMicroservice-10UUBO2NI2BS5"
+                }
+            },
+            "portMappings": [
+                {
+                    "hostPort": 8002,
+                    "protocol": "tcp",
+                    "containerPort": 8002
+                }
+            ],
+            "cpu": 256,
+            "memory": 512,
+            "memoryReservation": 512,
+            "image": "939458553633.dkr.ecr.ap-south-1.amazonaws.com/hoabl-ecr-dev-hoabl-admin-management:latest",
+            "name": "hoabl-admin-management-service" 
+        }
+    ],
+    "placementConstraints": [],
+    "taskRoleArn": "arn:aws:iam::939458553633:role/hoabl-backend-dev-ECS-8BYICHEIZ-ECSServiceTaskRole-1MBUL7RK0055K",
+    "family": "hoabl-admin-management-service",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "networkMode": "awsvpc",
+    "cpu": "512",
+    "memory": "1024",
+    "volumes": []
+}

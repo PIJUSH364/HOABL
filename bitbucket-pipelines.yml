@@ -1,0 +1,78 @@
+---
+image: "node:14.0.0"
+pipelines:
+  branches:
+    development:
+      - step:
+          name: Build
+          services:
+            - docker
+          image: atlassian/pipelines-awscli
+          script:
+            - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_DEVELOPMENT_HOST
+            - docker build -t $ECR_DEVELOPMENT_REPO_NAME .
+            - docker tag $ECR_DEVELOPMENT_REPO_NAME:latest $ECR_DEVELOPMENT_REPO_URI:latest
+            - docker push $ECR_DEVELOPMENT_REPO_URI:latest
+      - step:
+          name: Deploy to Development
+          deployment: development
+          script:
+            - pipe: atlassian/aws-ecs-deploy:1.0.3
+              variables:
+                AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+                AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+                CLUSTER_NAME: $ECS_DEVELOPMENT_CLUSTER_NAME
+                SERVICE_NAME: $ECS_DEVELOPMENT_SERVICE_NAME
+                TASK_DEFINITION: "development_task_definition.json"
+                DEBUG: "true"
+
+    staging:
+      - step:
+          name: Build
+          services:
+            - docker
+          image: atlassian/pipelines-awscli
+          script:
+            - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_STAGING_HOST
+            - docker build -t $ECR_STAGING_REPO_NAME .
+            - docker tag $ECR_STAGING_REPO_NAME:latest $ECR_STAGING_REPO_URI:latest
+            - docker push $ECR_STAGING_REPO_URI:latest
+      - step:
+          name: Deploy to Staging
+          deployment: staging
+          script:
+            - pipe: atlassian/aws-ecs-deploy:1.0.3
+              variables:
+                AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+                AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+                CLUSTER_NAME: $ECS_STAGING_CLUSTER_NAME
+                SERVICE_NAME: $ECS_STAGING_SERVICE_NAME
+                TASK_DEFINITION: "staging_task_definition.json"
+                DEBUG: "true"
+
+    pre-production:
+      - step:
+          name: Build
+          services:
+            - docker
+          image: atlassian/pipelines-awscli
+          script:
+            - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_PRE_PRODUCTION_HOST
+            - docker build -t $ECR_PRE_PRODUCTION_REPO_NAME .
+            - docker tag $ECR_PRE_PRODUCTION_REPO_NAME:latest $ECR_PRE_PRODUCTION_REPO_URI:latest
+            - docker push $ECR_PRE_PRODUCTION_REPO_URI:latest
+      - step:
+          name: Deploy to Pre Production
+          deployment: pre-production
+          script:
+            - pipe: atlassian/aws-ecs-deploy:1.0.3
+              variables:
+                AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+                AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+                CLUSTER_NAME: $ECS_PRE_PRODUCTION_CLUSTER_NAME
+                SERVICE_NAME: $ECS_PRE_PRODUCTION_SERVICE_NAME
+                TASK_DEFINITION: "pre-production_task_definition.json"
+                DEBUG: "true"
