@@ -14,6 +14,11 @@ const options8003 = {
   changeOrigin: true,
 };
 
+const options8008 = {
+  target: `http://localhost:${basePort + 8}`,
+  changeOrigin: true,
+};
+
 const options8005 = {
   target: `http://localhost:${basePort + 5}`,
   changeOrigin: true,
@@ -29,7 +34,14 @@ app.get("/", (req, res) => {
 });
 
 // Proxy paths based on some criteria, e.g., path starts with /api1 goes to port 3000
-app.use("/hoabl-admin", createProxyMiddleware(options8002));
+app.use(
+  "/hoabl-admin",
+  (req, res, next) => {
+    // console.log(req);
+    next();
+  },
+  createProxyMiddleware(options8002),
+);
 app.use(
   "/hoabl-customer",
   (req, res, next) => {
@@ -37,6 +49,15 @@ app.use(
     next();
   },
   createProxyMiddleware(options8003),
+);
+
+app.use(
+  "/hoabl-customer-temp",
+  (req, res, next) => {
+    // console.log(req.headers);
+    next();
+  },
+  createProxyMiddleware(options8008),
 );
 app.use("/hoabl-payment", createProxyMiddleware(options8005));
 
